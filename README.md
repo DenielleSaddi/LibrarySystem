@@ -1,4 +1,4 @@
 # LibrarySystem
 
-Email: jcesperanza@neu.edu.ph
+Email: jcesperanza@neu.edu.ph\
 Password: admin123
