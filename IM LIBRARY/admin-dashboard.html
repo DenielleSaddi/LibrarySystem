@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>NEU Library – Admin Dashboard</title>
+ 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+  const SUPABASE_URL = 'https://zzsefmxfbzidaxhoywcs.supabase.co';
+  const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inp6c2VmbXhmYnppZGF4aG95d2NzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM5MjY4OTQsImV4cCI6MjA4OTUwMjg5NH0.eBwOc_b9Ml6OdeLR742xsaEbQxHFHoFNEQHfdFr6S5s';
+  const { createClient } = supabase;
+  const db = createClient(SUPABASE_URL, SUPABASE_KEY);
+</script>
+ 
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --navy: #1e2a4a; --navy-l: #2c3d6b; --navy-c: #253561;
+  --gold: #c9a84c; --white: #fff; --gray: #9ca3af; --bg: #f0ede8;
+}
+body { font-family: Arial, Helvetica, sans-serif; background: var(--bg); min-height: 100vh; }
+ 
+.navbar {
+  background: #fefefe; border-bottom: 1.5px solid #e0dcd4;
+  height: 62px; display: flex; align-items: center;
+  justify-content: space-between; padding: 0 36px;
+  position: sticky; top: 0; z-index: 100;
+  box-shadow: 0 2px 14px rgba(30,42,74,.07);
+}
+.nav-l { display: flex; align-items: center; gap: 11px; }
+.logo-ring {
+  width: 38px; height: 38px; background: var(--navy); border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  border: 2px solid var(--gold); flex-shrink: 0; overflow: hidden;
+}
+.logo-ring img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; }
+.brand { font-family: Georgia, serif; font-size: .97rem; font-weight: 700; color: var(--navy); }
+.brand em { color: var(--gold); font-style: normal; }
+.nav-r { display: flex; align-items: center; gap: 12px; }
+.nav-email { font-size: .8rem; color: var(--gray); }
+.btn-out {
+  border: 1.5px solid #ef4444; color: #ef4444; background: none;
+  padding: 6px 18px; border-radius: 8px; font-size: .8rem; font-weight: 600;
+  cursor: pointer; transition: all .2s;
+}
+.btn-out:hover { background: #ef4444; color: #fff; }
+ 
+.main { padding: 36px 32px 80px; max-width: 1300px; margin: 0 auto; }
+.page-title { font-family: Georgia, serif; font-size: 1.7rem; font-weight: 700; color: var(--navy); margin-bottom: 5px; }
+.page-sub { font-size: .81rem; color: #6b7280; margin-bottom: 30px; }
+ 
+.stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 28px; }
+.s-card {
+  background: var(--navy-c); border-radius: 14px;
+  padding: 24px 28px; border: 1px solid rgba(255,255,255,.07);
+}
+.s-lbl { font-size: .67rem; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; color: var(--gray); margin-bottom: 10px; }
+.s-num { font-size: 2.6rem; font-weight: 700; color: #fff; line-height: 1; }
+ 
+.panel { background: var(--white); border-radius: 15px; padding: 28px 32px; margin-bottom: 22px; }
+.panel-title { font-size: .97rem; font-weight: 700; color: var(--navy); margin-bottom: 20px; }
+ 
+.frow { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-bottom: 18px; }
+.f-lbl { font-size: .68rem; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; color: var(--navy); margin-bottom: 6px; }
+.f-sel {
+  width: 100%; padding: 10px 13px; border: 1.5px solid #d4d0c8; border-radius: 9px;
+  font-family: Arial, Helvetica, sans-serif; font-size: .84rem; color: var(--navy);
+  background: #fff; outline: none; appearance: none; cursor: pointer; transition: border-color .2s;
+}
+.f-sel:focus { border-color: var(--navy); }
+.fbtns { display: flex; gap: 10px; flex-wrap: wrap; }
+.btn-af {
+  background: var(--navy); color: #fff; border: none; padding: 10px 24px;
+  border-radius: 9px; font-size: .85rem; font-weight: 700; cursor: pointer; transition: background .2s;
+}
+.btn-af:hover { background: var(--navy-l); }
+.btn-rf {
+  background: none; color: var(--navy); border: 1.5px solid var(--navy);
+  padding: 10px 24px; border-radius: 9px; font-size: .85rem; font-weight: 600;
+  cursor: pointer; transition: all .2s;
+}
+.btn-rf:hover { background: var(--navy); color: #fff; }
+.btn-export {
+  background: var(--gold); color: var(--navy); border: none; padding: 10px 24px;
+  border-radius: 9px; font-size: .85rem; font-weight: 700; cursor: pointer; transition: all .2s;
+  margin-left: auto;
+}
+.btn-export:hover { background: #a8863a; color: #fff; }
+ 
+.tbl-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 18px; flex-wrap: wrap; gap: 10px; }
+.tbl-title { font-size: .97rem; font-weight: 700; color: var(--navy); }
+.badge { background: var(--gold); color: var(--navy); font-size: .74rem; font-weight: 700; padding: 4px 13px; border-radius: 20px; }
+.twrap { overflow-x: auto; }
+table { width: 100%; border-collapse: collapse; font-size: .83rem; }
+thead { background: var(--navy); }
+th { text-align: left; font-size: .67rem; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; color: #fff; padding: 13px 16px; white-space: nowrap; }
+td { padding: 14px 16px; color: #374151; border-bottom: 1px solid #f0ede7; vertical-align: middle; }
+tr:last-child td { border-bottom: none; }
+tr:hover td { background: #fafaf7; }
+.pill { display: inline-block; padding: 3px 12px; border-radius: 20px; font-size: .72rem; font-weight: 700; white-space: nowrap; }
+.ps { background: #dbeafe; color: #1d4ed8; }
+.pf { background: #d1fae5; color: #065f46; }
+.pe { background: #fef3c7; color: #92400e; }
+.empty-row td { text-align: center; color: #9ca3af; padding: 60px; font-style: italic; font-size: .9rem; }
+.loading-row td { text-align: center; color: #9ca3af; padding: 40px; font-size: .9rem; }
+ 
+@media (max-width: 900px)  { .stats { grid-template-columns: 1fr 1fr; } .frow { grid-template-columns: 1fr 1fr; } }
+@media (max-width: 560px)  { .main { padding: 24px 14px; } .navbar { padding: 0 14px; } .nav-email { display: none; } }
+</style>
+</head>
+<body>
+ 
+<nav class="navbar">
+  <div class="nav-l">
+    <div class="logo-ring">
+      <img src="logo.png" alt="NEU Logo"/>
+    </div>
+    <span class="brand">NEU Library &nbsp;/&nbsp; <em>Admin Panel</em></span>
+  </div>
+  <div class="nav-r">
+    <span class="nav-email" id="adm-email"></span>
+    <button class="btn-out" onclick="logout()">Logout</button>
+  </div>
+</nav>
+ 
+<div class="main">
+  <h2 class="page-title">Admin Dashboard</h2>
+  <p class="page-sub" id="updated">Last updated: —</p>
+ 
+  <div class="stats">
+    <div class="s-card"><div class="s-lbl">Today</div><div class="s-num" id="st-d">—</div></div>
+    <div class="s-card"><div class="s-lbl">This Week</div><div class="s-num" id="st-w">—</div></div>
+    <div class="s-card"><div class="s-lbl">This Month</div><div class="s-num" id="st-m">—</div></div>
+    <div class="s-card"><div class="s-lbl">All Time</div><div class="s-num" id="st-a">—</div></div>
+  </div>
+ 
+  <div class="panel">
+    <div class="panel-title">Filter Visitor Records</div>
+    <div class="frow">
+      <div>
+        <div class="f-lbl">Date Range</div>
+        <select class="f-sel" id="fd">
+          <option value="">All Time</option>
+          <option value="today">Today</option>
+          <option value="week">This Week</option>
+          <option value="month">This Month</option>
+        </select>
+      </div>
+      <div>
+        <div class="f-lbl">Purpose of Visit</div>
+        <select class="f-sel" id="fr">
+          <option value="">All Purposes</option>
+          <option>Study</option>
+          <option>Research</option>
+          <option>Borrow Books</option>
+          <option>Return Books</option>
+          <option>Internet Use</option>
+          <option>Group Study</option>
+        </select>
+      </div>
+      <div>
+        <div class="f-lbl">Department / Office</div>
+        <select class="f-sel" id="fc">
+          <option value="">All</option>
+          <optgroup label="Student Colleges" id="opt-student">
+            <option>School of Graduate Studies</option>
+            <option>College of Accountancy</option>
+            <option>College of Arts and Sciences</option>
+            <option>College of Business Administration</option>
+            <option>College of Communication</option>
+            <option>College of Computer Studies and Information Sciences</option>
+            <option>College of Criminology</option>
+            <option>College of Education</option>
+            <option>College of Engineering and Architecture</option>
+            <option>College of Nursing</option>
+            <option>College of Allied Health Sciences</option>
+            <option>College of Music</option>
+            <option>College of Tourism and Hospitality Management</option>
+          </optgroup>
+          <optgroup label="Employee / Administrative Offices" id="opt-employee">
+            <option>Office of the President</option>
+            <option>Library</option>
+            <option>Office of the Registrar</option>
+            <option>Office of Student Affairs and Services</option>
+            <option>Information Technology Services</option>
+            <option>Finance and Accounting</option>
+            <option>Human Resources</option>
+            <option>Security Services</option>
+            <option>Facilities and Maintenance</option>
+            <option>University Clinic</option>
+            <option>Canteen / Food Services</option>
+          </optgroup>
+        </select>
+      </div>
+      <div>
+        <div class="f-lbl">User Type</div>
+        <select class="f-sel" id="ft" onchange="onTypeChange()">
+          <option value="">All Types</option>
+          <option>Student</option>
+          <option>Faculty</option>
+          <option>Employee</option>
+        </select>
+      </div>
+    </div>
+    <div class="fbtns">
+      <button class="btn-af" onclick="applyFilters()">Apply Filters</button>
+      <button class="btn-rf" onclick="resetFilters()">Reset Filters</button>
+      <button class="btn-export" onclick="exportCSV()">⬇ Export CSV</button>
+    </div>
+  </div>
+ 
+  <div class="panel">
+    <div class="tbl-head">
+      <div class="tbl-title">Visitor Records</div>
+      <div class="badge" id="rec-cnt">Loading…</div>
+    </div>
+    <div class="twrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Date &amp; Time</th>
+            <th>Full Name</th>
+            <th>ID Number</th>
+            <th>Email</th>
+            <th>User Type</th>
+            <th>Department / Office</th>
+            <th>Course / Position</th>
+            <th>Purpose</th>
+          </tr>
+        </thead>
+        <tbody id="tbody">
+          <tr class="loading-row"><td colspan="8">Loading visitor records…</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+ 
+<script>
+if (localStorage.getItem('neu_admin') !== 'true') {
+  window.location.href = 'index.html';
+}
+ 
+document.getElementById('adm-email').textContent = localStorage.getItem('neu_admin_em') || '';
+ 
+const now = new Date();
+document.getElementById('updated').textContent =
+  'Last updated: ' + now.toLocaleString('en-US', {
+    month: 'short', day: 'numeric', year: 'numeric',
+    hour: 'numeric', minute: '2-digit', hour12: true
+  });
+ 
+const sow = new Date(now);
+sow.setDate(now.getDate() - now.getDay());
+sow.setHours(0, 0, 0, 0);
+ 
+function sameDay(a, b) {
+  return a.getFullYear() === b.getFullYear() &&
+         a.getMonth()    === b.getMonth()    &&
+         a.getDate()     === b.getDate();
+}
+ 
+let allLogs = [];
+let filteredLogs = [];
+ 
+async function loadLogs() {
+  const { data, error } = await db
+    .from('neu_logs')
+    .select('*')
+    .order('date_time', { ascending: false });
+ 
+  if (error) {
+    console.error('Failed to load logs:', error);
+    document.getElementById('tbody').innerHTML =
+      '<tr class="empty-row"><td colspan="8">Failed to load records. Please refresh the page.</td></tr>';
+    document.getElementById('rec-cnt').textContent = 'Error';
+    return;
+  }
+ 
+  allLogs = data || [];
+  filteredLogs = [...allLogs];
+  updateStats();
+  renderTable(filteredLogs);
+}
+ 
+function updateStats() {
+  let td = 0, wk = 0, mn = 0;
+  allLogs.forEach(l => {
+    const d = new Date(l.date_time);
+    if (isNaN(d)) return;
+    if (sameDay(d, now)) td++;
+    if (d >= sow) wk++;
+    if (d.getFullYear() === now.getFullYear() && d.getMonth() === now.getMonth()) mn++;
+  });
+  document.getElementById('st-d').textContent = td;
+  document.getElementById('st-w').textContent = wk;
+  document.getElementById('st-m').textContent = mn;
+  document.getElementById('st-a').textContent = allLogs.length;
+}
+ 
+function pillCls(t) {
+  if (!t) return 'ps';
+  const tl = t.toLowerCase();
+  if (tl === 'faculty')  return 'pf';
+  if (tl === 'employee') return 'pe';
+  return 'ps';
+}
+ 
+function renderTable(logs) {
+  document.getElementById('rec-cnt').textContent =
+    logs.length + ' record' + (logs.length !== 1 ? 's' : '');
+  const body = document.getElementById('tbody');
+  if (!logs.length) {
+    body.innerHTML = '<tr class="empty-row"><td colspan="8">No visitor records found matching the selected filters.</td></tr>';
+    return;
+  }
+  body.innerHTML = logs.map(l => `
+    <tr>
+      <td style="white-space:nowrap;font-size:.82rem">${l.display_time || new Date(l.date_time).toLocaleString('en-US',{month:'short',day:'numeric',year:'numeric',hour:'numeric',minute:'2-digit',hour12:true})}</td>
+      <td><strong>${l.full_name || '—'}</strong></td>
+      <td style="font-size:.82rem;color:#6b7280">${l.id_number || '—'}</td>
+      <td style="color:#6b7280;font-size:.79rem">${l.email || '—'}</td>
+      <td><span class="pill ${pillCls(l.user_type)}">${l.user_type || 'Student'}</span></td>
+      <td style="font-size:.81rem">${l.college || '—'}</td>
+      <td style="font-size:.81rem">${l.course  || '—'}</td>
+      <td style="font-weight:600">${l.reason  || '—'}</td>
+    </tr>`).join('');
+}
+ 
+function applyFilters() {
+  const fd = document.getElementById('fd').value;
+  const fr = document.getElementById('fr').value;
+  const fc = document.getElementById('fc').value;
+  const ft = document.getElementById('ft').value;
+ 
+  filteredLogs = allLogs.filter(l => {
+    if (fr && l.reason    !== fr) return false;
+    if (fc && l.college   !== fc) return false;
+    if (ft && l.user_type !== ft) return false;
+    if (fd) {
+      const d = new Date(l.date_time);
+      if (fd === 'today' && !sameDay(d, now)) return false;
+      if (fd === 'week'  && d < sow)          return false;
+      if (fd === 'month' && !(
+        d.getFullYear() === now.getFullYear() &&
+        d.getMonth()    === now.getMonth()
+      )) return false;
+    }
+    return true;
+  });
+  renderTable(filteredLogs);
+}
+ 
+function onTypeChange() {
+  const type = document.getElementById('ft').value.toLowerCase();
+  const optStudent  = document.getElementById('opt-student');
+  const optEmployee = document.getElementById('opt-employee');
+  document.getElementById('fc').value = '';
+  if (type === 'student' || type === 'faculty') {
+    optStudent.style.display = ''; optEmployee.style.display = 'none';
+  } else if (type === 'employee') {
+    optStudent.style.display = 'none'; optEmployee.style.display = '';
+  } else {
+    optStudent.style.display = ''; optEmployee.style.display = '';
+  }
+}
+ 
+function resetFilters() {
+  ['fd', 'fr', 'fc', 'ft'].forEach(id => document.getElementById(id).value = '');
+  onTypeChange();
+  filteredLogs = [...allLogs];
+  renderTable(filteredLogs);
+}
+ 
+function exportCSV() {
+  if (!filteredLogs.length) { alert('No records to export.'); return; }
+  const headers = ['Date & Time','Full Name','ID Number','Email','User Type','College / Office','Course / Program','Purpose'];
+  const rows = filteredLogs.map(l => [
+    l.display_time || l.date_time,
+    l.full_name, l.id_number, l.email,
+    l.user_type, l.college, l.course, l.reason
+  ].map(v => `"${(v || '').replace(/"/g, '""')}"`).join(','));
+  const csv  = [headers.join(','), ...rows].join('\n');
+  const blob = new Blob([csv], { type: 'text/csv' });
+  const url  = URL.createObjectURL(blob);
+  const a    = document.createElement('a');
+  a.href = url;
+  a.download = `neu-library-logs-${new Date().toISOString().slice(0,10)}.csv`;
+  a.click();
+  URL.revokeObjectURL(url);
+}
+ 
+function logout() {
+  localStorage.removeItem('neu_admin');
+  localStorage.removeItem('neu_admin_em');
+  window.location.href = 'index.html';
+}
+ 
+loadLogs();
+</script>
+</body>
+</html>
